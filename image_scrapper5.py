@@ -144,13 +144,8 @@ def save_first_image(user):
 if __name__ == "__main__":
     setup_driver()
     login(username, password)
-    # companies = [
-    #     'americanexpress',
-    #     'ikea',
-    #     'allianz',
-    #     'hyundai'
-    # ]
-    # for comapny in companies:
-    save_first_image('hyundaiusa')  # Change to desired Instagram handle
+    # companies = []
+    # for company in companies:
+    #     save_first_image(company)  # Change to desired Instagram handle
     chrome.quit()
 x
