@@ -10,19 +10,15 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup as bs
 from Keys import IG_USERNAME, IG_PASSWORD
 
-# Credentials
 username = IG_USERNAME
 password = IG_PASSWORD
 
-# Instagram URL
 url = "https://www.instagram.com"
 
-# Setup WebDriver
 def setup_driver():
     global chrome
     chrome = webdriver.Chrome()
 
-# Login function
 def login(username, password):
     chrome.get(url)
     time.sleep(4)
@@ -33,7 +29,6 @@ def login(username, password):
     passw.send_keys(Keys.RETURN)
     time.sleep(6)
 
-    # Handle pop-ups if present
     try:
         not_now_btn = WebDriverWait(chrome, 5).until(
             EC.element_to_be_clickable((By.CLASS_NAME, "_acan"))
@@ -43,7 +38,6 @@ def login(username, password):
     except:
         pass
 
-# Save post details to CSV
 def save_to_csv(user, post_url, img_name, post_date):
     file_path = f"{user}_posts.csv"
     file_exists = os.path.isfile(file_path)
@@ -53,23 +47,19 @@ def save_to_csv(user, post_url, img_name, post_date):
             writer.writerow(["Post URL", "Image Name", "Post Date"])
         writer.writerow([post_url, img_name, post_date])
 
-# Save the first image of each post and get the post date from the post's detail page
 def save_first_image(user):
-    # Open the user page
     chrome.get(f"https://www.instagram.com/{user}/")
     time.sleep(4)
 
-    # Create a folder for the user if it doesn't exist
     if not os.path.isdir(user):
         os.mkdir(user)
 
-    seen_posts = set()  # To track unique posts and avoid duplicates
+    seen_posts = set()
     count = 1
     last_height = chrome.execute_script("return document.body.scrollHeight")
 
     while True:
         try:
-            # Get the posts after every scroll
             posts = chrome.find_elements(By.CLASS_NAME, "x1lliihq")
 
             for post in posts:
@@ -94,7 +84,6 @@ def save_first_image(user):
                     if img_url in seen_posts:
                         continue
 
-                    # Download the image
                     response = requests.get(img_url)
                     with open(f"{user}/{img_name}", "wb") as f:
                         f.write(response.content)
@@ -116,7 +105,6 @@ def save_first_image(user):
                         print(f"Error retrieving post date for post {count}: {e}")
                         post_date = ""
                     
-                    # Save details to CSV
                     save_to_csv(user, post_url, img_name, post_date)
                     
                     seen_posts.add(img_url)
@@ -127,8 +115,7 @@ def save_first_image(user):
                     print(f"Error saving post {count}: {e}")
                     continue
 
-            # Scroll down to load more posts
-            chrome.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            chrome.execute_script("window.scrollTo(0, document.body.scrollHeight);") #scroll down
             time.sleep(3)
             new_height = chrome.execute_script("return document.body.scrollHeight")
             if new_height == last_height:
@@ -140,12 +127,11 @@ def save_first_image(user):
             print(f"Error during scrolling: {e}")
             break
 
-# Main execution
 if __name__ == "__main__":
     setup_driver()
     login(username, password)
-    # companies = []
-    # for company in companies:
-    #     save_first_image(company)  # Change to desired Instagram handle
+    companies = [] #desired companies
+    for company in companies:
+        save_first_image(company)  
     chrome.quit()
 x
